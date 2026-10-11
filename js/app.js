@@ -6,6 +6,7 @@ import { initPanels } from "./panels.js";
 import { initBackdrop, cycleBackdropMode } from "./backdrop.js";
 import { initAmbient, cycleAmbientMode } from "./ambient.js";
 import { initAtmosphere } from "./spotify.js";
+import { initEmails } from "./emails.js";
 
 const els = {
   date: document.getElementById("date"),
@@ -138,4 +139,5 @@ await initAmbient();
 await initTasks();
 await initTimer();
 await initPanels();
+await initEmails();
 await initAtmosphere();

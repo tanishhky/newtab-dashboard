@@ -41,7 +41,8 @@ def bucket(status: str) -> str:
 
 def short_status(status: str) -> str:
     """Keep the leading clause only: 'Applied 2026-09-30 (Greenhouse ...)' -> 'Applied 2026-09-30'."""
-    return re.split(r"\s[\(\-]", status.strip(), maxsplit=1)[0].strip()
+    s = status.replace("\u2014", "-").replace("\u2013", "-")
+    return re.split(r"\s[\(\-]", s.strip(), maxsplit=1)[0].strip()
 
 
 def parse_log_date(raw: str) -> str | None:
