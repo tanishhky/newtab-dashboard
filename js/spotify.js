@@ -3,7 +3,7 @@
 
 import { load, save } from "./store.js";
 import { setAmbientMode, getAmbientMode, setAmbientVolume, getAmbientVolume } from "./ambient.js";
-import { cycleCosmosMode, getCosmosMode } from "./canvas.js";
+import { cycleBackdropMode, getBackdropLabel } from "./backdrop.js";
 
 const SPOTIFY_URI_KEY = "spotify_active_uri";
 
@@ -11,26 +11,20 @@ const PRESETS = [
   {
     name: "Interstellar",
     artist: "Hans Zimmer",
-    uri: "spotify:album:1jpHPW2o59ezY0e45t5v1B",
-    embed: "https://open.spotify.com/embed/album/1jpHPW2o59ezY0e45t5v1B?utm_source=generator&theme=0",
+    uri: "spotify:album:6wDT7iD3yCXPOUZNAAprjl",
+    embed: "https://open.spotify.com/embed/album/6wDT7iD3yCXPOUZNAAprjl?utm_source=generator&theme=0",
   },
   {
     name: "Oppenheimer",
     artist: "Ludwig Göransson",
-    uri: "spotify:album:7GVkS6r062fI9sJ15UqT9Q",
-    embed: "https://open.spotify.com/embed/album/7GVkS6r062fI9sJ15UqT9Q?utm_source=generator&theme=0",
+    uri: "spotify:album:0rwbMKjNkp4ehQTwf9V2Jk",
+    embed: "https://open.spotify.com/embed/album/0rwbMKjNkp4ehQTwf9V2Jk?utm_source=generator&theme=0",
   },
   {
     name: "Deep Focus",
-    artist: "Atmospheric Lofi / Ambient",
+    artist: "Ambient Focus",
     uri: "spotify:playlist:37i9dQZF1DWZeKCadgRdKQ",
     embed: "https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0",
-  },
-  {
-    name: "Synthwave / Cyberpunk",
-    artist: "Focus Beats",
-    uri: "spotify:playlist:37i9dQZF1DXdLEN7aqioXM",
-    embed: "https://open.spotify.com/embed/playlist/37i9dQZF1DXdLEN7aqioXM?utm_source=generator&theme=0",
   },
 ];
 
@@ -42,7 +36,6 @@ export async function initAtmosphere() {
 
   renderAtmosphere(currentEmbedUri);
 
-  // Listen for ambient mode changes from shortcuts or buttons
   window.addEventListener("ambient-mode-change", () => {
     updateAmbientUI();
   });
@@ -62,8 +55,7 @@ function updateAmbientUI() {
 
   const cosmosBtn = document.getElementById("cosmos-toggle-btn");
   if (cosmosBtn) {
-    const cMode = getCosmosMode();
-    cosmosBtn.textContent = cMode === "gargantua" ? "Gargantua" : cMode === "stars" ? "Starfield" : "Void Off";
+    cosmosBtn.textContent = getBackdropLabel();
   }
 }
 
@@ -71,20 +63,22 @@ function renderAtmosphere(activeEmbed) {
   const card = document.getElementById("atmosphere-card");
   if (!card) return;
 
+  const selectedPreset = PRESETS.find((p) => p.embed === activeEmbed) || PRESETS[0];
+
   card.innerHTML = `
     <header class="card-head">
       <div class="head-title-row">
         <h2 id="atmosphere-title">Atmosphere</h2>
         <span class="meta" id="cosmos-status">Deep Spacetime</span>
       </div>
-      <button class="btn btn-ghost btn-sm" id="cosmos-toggle-btn" title="Toggle background cosmos (B)">
-        ${getCosmosMode() === "gargantua" ? "Gargantua" : getCosmosMode() === "stars" ? "Starfield" : "Void Off"}
+      <button class="btn btn-ghost btn-sm" id="cosmos-toggle-btn" title="Cycle visual backdrop (B)">
+        ${getBackdropLabel()}
       </button>
     </header>
 
     <div class="ambient-controls">
       <div class="sound-mode-group">
-        <span class="sub-label">Focus Sound</span>
+        <span class="sub-label">Synthesized Sound</span>
         <div class="btn-group">
           <button class="btn btn-sm sound-mode-btn ${getAmbientMode() === "off" ? "active" : ""}" data-mode="off" type="button">Off</button>
           <button class="btn btn-sm sound-mode-btn ${getAmbientMode() === "tick" ? "active" : ""}" data-mode="tick" type="button" title="Miller's Planet 1.25s cadence">Miller's Tick</button>
@@ -98,14 +92,17 @@ function renderAtmosphere(activeEmbed) {
     </div>
 
     <div class="spotify-section">
-      <div class="preset-pills" id="spotify-presets">
-        ${PRESETS.map((p) => `
-          <button class="pill-btn ${activeEmbed.includes(p.name.toLowerCase()) || activeEmbed === p.embed ? "selected" : ""}"
-                  data-embed="${p.embed}"
-                  data-uri="${p.uri}">
-            ${p.name}
-          </button>
-        `).join("")}
+      <div class="preset-header">
+        <div class="preset-pills" id="spotify-presets">
+          ${PRESETS.map((p) => `
+            <button class="pill-btn ${activeEmbed === p.embed ? "selected" : ""}"
+                    data-embed="${p.embed}"
+                    data-uri="${p.uri}">
+              ${p.name}
+            </button>
+          `).join("")}
+        </div>
+        <a class="spotify-app-link" id="spotify-app-link" href="${selectedPreset.uri}" title="Open in Spotify App">Open App ↗</a>
       </div>
 
       <div class="spotify-embed-wrap">
@@ -123,9 +120,9 @@ function renderAtmosphere(activeEmbed) {
 
   // Bind cosmos button
   document.getElementById("cosmos-toggle-btn").addEventListener("click", async () => {
-    const nextMode = await cycleCosmosMode();
+    await cycleBackdropMode();
     const btn = document.getElementById("cosmos-toggle-btn");
-    btn.textContent = nextMode === "gargantua" ? "Gargantua" : nextMode === "stars" ? "Starfield" : "Void Off";
+    btn.textContent = getBackdropLabel();
   });
 
   // Bind ambient mode buttons
@@ -149,8 +146,11 @@ function renderAtmosphere(activeEmbed) {
       presetBtns.forEach((b) => b.classList.remove("selected"));
       btn.classList.add("selected");
       const embedUrl = btn.dataset.embed;
+      const appUri = btn.dataset.uri;
       const frame = document.getElementById("spotify-frame");
       if (frame) frame.src = embedUrl;
+      const appLink = document.getElementById("spotify-app-link");
+      if (appLink) appLink.href = appUri;
       await save(SPOTIFY_URI_KEY, embedUrl);
     });
   });

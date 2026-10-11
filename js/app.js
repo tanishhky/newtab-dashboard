@@ -3,7 +3,7 @@
 import { initTasks, focusTaskInput } from "./tasks.js";
 import { initTimer, toggleTimer, resetTimer } from "./timer.js";
 import { initPanels } from "./panels.js";
-import { initCanvas, cycleCosmosMode } from "./canvas.js";
+import { initBackdrop, cycleBackdropMode } from "./backdrop.js";
 import { initAmbient, cycleAmbientMode } from "./ambient.js";
 import { initAtmosphere } from "./spotify.js";
 
@@ -117,7 +117,7 @@ function bindShortcuts() {
       await cycleAmbientMode();
     } else if (event.key.toLowerCase() === "b") {
       event.preventDefault();
-      await cycleCosmosMode();
+      await cycleBackdropMode();
     }
   });
 }
@@ -133,7 +133,7 @@ if (els.quote) {
 }
 
 bindShortcuts();
-await initCanvas();
+await initBackdrop();
 await initAmbient();
 await initTasks();
 await initTimer();

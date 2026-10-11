@@ -1,14 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="dark">
   <title>Dashboard · Endurance</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <canvas id="cosmos-canvas" class="cosmos-canvas" aria-hidden="true"></canvas>
+  <div class="cosmos-backdrop" id="cosmos-backdrop">
+    <img id="bg-media" class="bg-media" src="assets/gargantua-cinematic.gif" alt="Gargantua Accretion Disk">
+    <div class="bg-vignette"></div>
+  </div>
 
   <main class="shell">
     <header class="masthead">

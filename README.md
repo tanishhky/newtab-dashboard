@@ -38,13 +38,14 @@ Opened as a plain page, the storage layer falls back to `localStorage`, so tasks
 | `manifest.json` | MV3 manifest, overrides the new tab, requests `storage` only |
 | `newtab.html`, `styles.css` | 12-column balanced glass grid and Interstellar spacetime design |
 | `js/app.js` | Dual UTC clock, Sol day telemetry, quote ticker, shortcuts |
-| `js/canvas.js` | Procedural Starfield and Gargantua gravitational lens canvas |
+| `js/backdrop.js` | Cinematic space backdrop switcher and visual presets |
 | `js/ambient.js` | Web Audio API Miller's Planet tick and Cosmic Drone synthesizer |
 | `js/spotify.js` | Spotify atmospheric presets and focus sound controls |
 | `js/timer.js` | Endurance 12-module ring timer with Miller time dilation metrics |
 | `js/tasks.js` | Task list, persisted in `chrome.storage.local` |
 | `js/panels.js` | Deadlines, 4-bucket application pipeline, and quick links |
 | `js/store.js` | Storage with a `localStorage` fallback |
+| `assets/` | Cinematic Interstellar Gargantua background assets |
 | `tools/build_data.py` | Turns the CSV and deadline list into `js/data.js` |
 
 ## Keyboard Shortcuts
@@ -53,11 +54,11 @@ Opened as a plain page, the storage layer falls back to `localStorage`, so tasks
 - `Space` start or pause the timer
 - `R` reset the timer
 - `M` cycle focus audio mode (Off, Miller's Tick, Cosmic Drone)
-- `B` cycle cosmos visual mode (Gargantua, Starfield, Void Off)
+- `B` cycle cosmos visual backdrop (Endurance Orbit, Gargantua 360, Void Black)
 
 ## Spacetime and Atmosphere Features
 
-- **Gargantua Accretion Canvas:** Interactive relativistic gravitational lens and starfield canvas with subtle mouse parallax, pausing automatically on hidden tabs to preserve battery.
+- **Cinematic Gargantua Backdrop:** High-fidelity Interstellar accretion disk loop with cinematic vignette framing and full glassmorphism cards.
 - **Miller's Planet Tick:** Synthesized 1.25s mechanical cadence (where every tick represents one Earth day) via Web Audio API.
 - **Cosmic Drone:** Deep space binaural ambient hum for focus sessions.
 - **Endurance Ring:** 12 orbital station module indicators tracking progress around the 25-minute Pomodoro cycle.
