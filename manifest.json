@@ -6,7 +6,18 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "permissions": ["storage"],
-  "host_permissions": ["https://mail.google.com/*"]
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["js/gmail_bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }
-
