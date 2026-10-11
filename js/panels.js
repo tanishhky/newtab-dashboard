@@ -242,6 +242,7 @@ function bindAccountControls() {
     await save(ACTIVE_ACCOUNT_KEY, event.target.value || null);
     await renderAccounts();
     await renderLinks();
+    window.dispatchEvent(new Event("account-changed"));
   });
 
   document.getElementById("account-remove")?.addEventListener("click", async () => {
@@ -251,6 +252,7 @@ function bindAccountControls() {
     await save(ACTIVE_ACCOUNT_KEY, null);
     await renderAccounts();
     await renderLinks();
+    window.dispatchEvent(new Event("account-changed"));
   });
 
   document.getElementById("account-form")?.addEventListener("submit", async (event) => {
@@ -269,6 +271,7 @@ function bindAccountControls() {
     event.target.reset();
     await renderAccounts();
     await renderLinks();
+    window.dispatchEvent(new Event("account-changed"));
   });
 }
 

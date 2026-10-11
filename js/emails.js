@@ -5,6 +5,31 @@ import { load, save } from "./store.js";
 
 const EMAILS_CACHE_KEY = "emails_cache";
 const GMAIL_FEED_URL = "https://mail.google.com/mail/feed/atom";
+const ACTIVE_ACCOUNT_KEY = "activeAccount";
+
+function feedUrl(account) {
+  return account ? `${GMAIL_FEED_URL}?authuser=${encodeURIComponent(account)}` : GMAIL_FEED_URL;
+}
+
+function loginUrl(account) {
+  return account ? `https://mail.google.com/mail/?authuser=${encodeURIComponent(account)}` : "https://mail.google.com";
+}
+
+function withAccount(href, account) {
+  if (!account) return href;
+  try {
+    const url = new URL(href);
+    url.searchParams.set("authuser", account);
+    return url.href;
+  } catch {
+    return href;
+  }
+}
+
+// A cached feed only counts if it was fetched for the account now selected.
+function sameAccount(payload, account) {
+  return (payload.account ?? null) === (account ?? null);
+}
 
 function timeAgo(dateStr) {
   if (!dateStr) return "";
@@ -27,9 +52,11 @@ function escapeHtml(str) {
 }
 
 export async function fetchLiveEmails() {
+  const account = await load(ACTIVE_ACCOUNT_KEY, null);
+
   // 1. Try direct fetch with credentials
   try {
-    const res = await fetch(GMAIL_FEED_URL, { credentials: "include" });
+    const res = await fetch(feedUrl(account), { credentials: "include" });
     if (res.ok) {
       const text = await res.text();
       const parser = new DOMParser();
@@ -41,11 +68,11 @@ export async function fetchLiveEmails() {
         title: entry.querySelector("title")?.textContent || "No Subject",
         summary: entry.querySelector("summary")?.textContent || "",
         author: entry.querySelector("author name")?.textContent || entry.querySelector("author email")?.textContent || "Unknown",
-        link: entry.querySelector("link")?.getAttribute("href") || "https://mail.google.com",
+        link: withAccount(entry.querySelector("link")?.getAttribute("href") || "https://mail.google.com", account),
         date: entry.querySelector("issued")?.textContent || entry.querySelector("modified")?.textContent || new Date().toISOString(),
       }));
 
-      const payload = { fullcount, entries, lastSync: Date.now(), error: null };
+      const payload = { fullcount, entries, lastSync: Date.now(), error: null, account };
       await save(EMAILS_CACHE_KEY, payload);
       return payload;
     }
@@ -77,58 +104,58 @@ export async function fetchLiveEmails() {
 
   // 3. Fallback to existing cache if present
   const cached = await load(EMAILS_CACHE_KEY, null);
-  if (cached && cached.entries && cached.entries.length) {
+  if (cached && cached.entries && cached.entries.length && sameAccount(cached, account)) {
     return cached;
   }
 
   return { fullcount: 0, entries: [], lastSync: null, error: "AUTH_REQUIRED" };
 }
 
+async function refreshEmails() {
+  const live = await fetchLiveEmails();
+  if (live.entries && live.entries.length) {
+    renderEmails(live.entries, live.fullcount);
+  } else {
+    renderLoginBox();
+  }
+}
+
 export async function initEmails() {
   const listEl = document.getElementById("email-list");
-  const countEl = document.getElementById("email-unread-count");
   const syncBtn = document.getElementById("email-refresh-btn");
   if (!listEl) return;
 
-  // 1. Render immediately from cache for zero latency
+  // 1. Render instantly from cache, but only if it belongs to the selected account
+  const account = await load(ACTIVE_ACCOUNT_KEY, null);
   const cached = await load(EMAILS_CACHE_KEY, null);
-  if (cached && cached.entries && cached.entries.length) {
+  if (cached && cached.entries && cached.entries.length && sameAccount(cached, account)) {
     renderEmails(cached.entries, cached.fullcount);
   } else {
     renderLoginBox();
   }
 
-  // 2. Fetch live in background
-  const live = await fetchLiveEmails();
-  if (live.entries && live.entries.length) {
-    renderEmails(live.entries, live.fullcount);
-  } else if (!cached || !cached.entries.length) {
-    renderLoginBox();
-  }
+  // 2. Fetch live for the selected account
+  await refreshEmails();
 
   // 3. Manual refresh button
   if (syncBtn) {
     syncBtn.addEventListener("click", async () => {
       syncBtn.classList.add("spinning");
-      const updated = await fetchLiveEmails();
-      if (updated.entries && updated.entries.length) {
-        renderEmails(updated.entries, updated.fullcount);
-      } else {
-        renderLoginBox();
-      }
+      await refreshEmails();
       setTimeout(() => syncBtn.classList.remove("spinning"), 600);
     });
   }
 
-  // 4. Reactive listener: updates automatically when Gmail tab syncs
+  // 4. Picking another account in the Links card reloads the feed
+  window.addEventListener("account-changed", refreshEmails);
+
+  // 5. Background syncs from the Gmail tab, accepted only for the selected account
   if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {
-    chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === "local" && changes.emails_cache && changes.emails_cache.newValue) {
-        const data = changes.emails_cache.newValue;
-        if (data.entries && data.entries.length) {
-          renderEmails(data.entries, data.fullcount);
-        }
-      }
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+      const data = changes.emails_cache?.newValue;
+      if (area !== "local" || !data || !data.entries || !data.entries.length) return;
+      const selected = await load(ACTIVE_ACCOUNT_KEY, null);
+      if (sameAccount(data, selected)) renderEmails(data.entries, data.fullcount);
     });
   }
 }
@@ -183,13 +210,14 @@ function renderLoginBox() {
 
   const btn = document.getElementById("email-login-action");
   if (btn) {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       btn.textContent = "Opening Gmail...";
       btn.disabled = true;
+      const url = loginUrl(await load(ACTIVE_ACCOUNT_KEY, null));
       if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.create) {
-        chrome.tabs.create({ url: "https://mail.google.com" });
+        chrome.tabs.create({ url });
       } else {
-        window.open("https://mail.google.com", "_blank");
+        window.open(url, "_blank");
       }
     });
   }

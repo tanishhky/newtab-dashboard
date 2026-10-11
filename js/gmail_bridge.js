@@ -1,9 +1,33 @@
 // Gmail Content Script Bridge
 // Runs inside active mail.google.com sessions with native cookie credentials.
 
+// The dashboard stores the chosen account under "activeAccount". Read it on
+// every sync so the feed follows the picker, not whichever tab is open.
+async function activeAccount() {
+  try {
+    const result = await chrome.storage.local.get("activeAccount");
+    return result.activeAccount || null;
+  } catch {
+    return null;
+  }
+}
+
+function withAccount(href, account) {
+  if (!account) return href;
+  try {
+    const url = new URL(href);
+    url.searchParams.set("authuser", account);
+    return url.href;
+  } catch {
+    return href;
+  }
+}
+
 async function extractFeed() {
   try {
-    const res = await fetch("/mail/feed/atom", { credentials: "include" });
+    const account = await activeAccount();
+    const feed = account ? `/mail/feed/atom?authuser=${encodeURIComponent(account)}` : "/mail/feed/atom";
+    const res = await fetch(feed, { credentials: "include" });
     if (!res.ok) return null;
     const text = await res.text();
     const parser = new DOMParser();
@@ -14,7 +38,8 @@ async function extractFeed() {
       const title = entry.querySelector("title")?.textContent || "No Subject";
       const summary = entry.querySelector("summary")?.textContent || "";
       const author = entry.querySelector("author name")?.textContent || entry.querySelector("author email")?.textContent || "Unknown";
-      const link = entry.querySelector("link")?.getAttribute("href") || "https://mail.google.com";
+      const rawLink = entry.querySelector("link")?.getAttribute("href") || "https://mail.google.com";
+      const link = withAccount(rawLink, account);
       const issued = entry.querySelector("issued")?.textContent || entry.querySelector("modified")?.textContent || new Date().toISOString();
 
       return {
@@ -27,7 +52,7 @@ async function extractFeed() {
       };
     });
 
-    const payload = { fullcount, entries, lastSync: Date.now(), error: null };
+    const payload = { fullcount, entries, lastSync: Date.now(), error: null, account };
 
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       await chrome.storage.local.set({
