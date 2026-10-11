@@ -1,64 +1,38 @@
-// Cinematic space backdrop controller.
-// Switches between high-resolution Interstellar assets and deep void black.
+// Backdrop controller: a static sky painted once by js/sky.js (no image assets, no animation).
+// Modes cycle with B or the Atmosphere card button.
 
 import { load, save } from "./store.js";
 
 const BACKDROP_KEY = "cosmos_backdrop_mode";
 
 const BACKDROPS = {
-  cinematic: {
-    src: "assets/gargantua-cinematic.gif",
-    label: "Endurance Orbit",
-    opacity: "0.68",
-    fit: "cover",
-  },
-  orbit: {
-    src: "assets/gargantua-orbit.gif",
-    label: "Gargantua 360",
-    opacity: "0.55",
-    fit: "contain",
-  },
-  void: {
-    src: "",
-    label: "Void Black",
-    opacity: "0",
-    fit: "cover",
-  },
+  gargantua: { label: "Gargantua" },
+  deep: { label: "Deep Field" },
+  void: { label: "Void" },
 };
 
-const MODES = ["cinematic", "orbit", "void"];
-let currentMode = "cinematic";
+const MODES = ["gargantua", "deep", "void"];
+// Modes saved by the old GIF version map onto the nearest static one.
+const LEGACY = { cinematic: "gargantua", orbit: "gargantua" };
+
+let currentMode = "gargantua";
+let repaint = null;
 
 export async function initBackdrop() {
-  const saved = await load(BACKDROP_KEY, "cinematic");
-  currentMode = MODES.includes(saved) ? saved : "cinematic";
-  applyBackdrop(currentMode);
-}
-
-function applyBackdrop(mode) {
-  const img = document.getElementById("bg-media");
-  const cfg = BACKDROPS[mode] || BACKDROPS.cinematic;
-  if (!img) return;
-
-  if (mode === "void" || !cfg.src) {
-    img.style.opacity = "0";
-  } else {
-    img.src = cfg.src;
-    img.style.objectFit = cfg.fit;
-    img.style.opacity = cfg.opacity;
-  }
-
-  const btn = document.getElementById("cosmos-toggle-btn");
-  if (btn) {
-    btn.textContent = cfg.label;
+  const saved = await load(BACKDROP_KEY, "gargantua");
+  currentMode = MODES.includes(saved) ? saved : LEGACY[saved] || "gargantua";
+  const canvas = document.getElementById("sky");
+  if (canvas && typeof window.mountSky === "function") {
+    repaint = window.mountSky(canvas, currentMode);
   }
 }
 
 export async function cycleBackdropMode() {
-  const nextIdx = (MODES.indexOf(currentMode) + 1) % MODES.length;
-  currentMode = MODES[nextIdx];
+  currentMode = MODES[(MODES.indexOf(currentMode) + 1) % MODES.length];
   await save(BACKDROP_KEY, currentMode);
-  applyBackdrop(currentMode);
+  repaint?.(currentMode);
+  const btn = document.getElementById("cosmos-toggle-btn");
+  if (btn) btn.textContent = BACKDROPS[currentMode].label;
   return currentMode;
 }
 
@@ -67,5 +41,5 @@ export function getBackdropMode() {
 }
 
 export function getBackdropLabel() {
-  return (BACKDROPS[currentMode] || BACKDROPS.cinematic).label;
+  return BACKDROPS[currentMode].label;
 }

@@ -9,8 +9,7 @@
 </head>
 <body>
   <div class="cosmos-backdrop" id="cosmos-backdrop">
-    <img id="bg-media" class="bg-media" src="assets/gargantua-cinematic.gif" alt="Gargantua Accretion Disk">
-    <div class="bg-vignette"></div>
+    <canvas id="sky" class="sky" aria-hidden="true"></canvas>
   </div>
 
   <main class="shell">
@@ -146,11 +145,12 @@
       <span><kbd class="kbd">Space</kbd> timer</span>
       <span><kbd class="kbd">R</kbd> reset</span>
       <span><kbd class="kbd">M</kbd> focus audio</span>
-      <span><kbd class="kbd">B</kbd> cosmos view</span>
+      <span><kbd class="kbd">B</kbd> sky</span>
       <span><kbd class="kbd">J</kbd> job hunt</span>
     </footer>
   </main>
 
+  <script src="js/sky.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
