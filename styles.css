@@ -1011,3 +1011,20 @@ button, input { font: inherit; color: inherit; }
     animation-duration: 0ms !important;
   }
 }
+
+/* Google account picker */
+.account-bar,
+.add-account {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-3);
+}
+
+.btn-quiet:disabled { opacity: 0.4; cursor: default; }
