@@ -1,7 +1,6 @@
-// Read-only panels built from the generated data module: deadlines,
-// application pipeline, and quick links.
+// Read-only panels: deadlines, application pipeline, and quick links.
+// Resilient to missing data.js: falls back to empty state with a build tip.
 
-import { DATA } from "./data.js";
 import { load, save } from "./store.js";
 
 const DEFAULT_LINKS = [
@@ -9,18 +8,23 @@ const DEFAULT_LINKS = [
   { label: "Calendar", url: "https://calendar.google.com" },
   { label: "Todoist", url: "https://app.todoist.com" },
   { label: "GitHub", url: "https://github.com/tanishhky" },
+  { label: "Brightspace", url: "https://brightspace.nyu.edu" },
+  { label: "Overleaf", url: "https://www.overleaf.com/project" },
+  { label: "WRDS", url: "https://wrds-www.wharton.upenn.edu" },
+  { label: "SSRN", url: "https://hq.ssrn.com" },
 ];
 
 const BUCKET_ORDER = [
   ["applied", "Applied"],
   ["assessment", "Assessment"],
-  ["selected", "Selected"],
+  ["ready", "Resume Ready"],
   ["rejected", "Rejected"],
 ];
 
 const LINKS_KEY = "links";
-
 const MS_PER_DAY = 86_400_000;
+
+let dataset = { applications: [], deadlines: [] };
 
 function startOfToday() {
   const d = new Date();
@@ -53,7 +57,9 @@ function el(tag, className, text) {
 function renderDeadlines() {
   const list = document.getElementById("deadline-list");
   const empty = document.getElementById("deadline-empty");
-  const upcoming = DATA.deadlines.filter((d) => daysUntil(d.date) >= 0).slice(0, 6);
+  if (!list) return;
+
+  const upcoming = (dataset.deadlines || []).filter((d) => daysUntil(d.date) >= 0).slice(0, 6);
 
   list.replaceChildren(
     ...upcoming.map((d) => {
@@ -72,35 +78,47 @@ function renderDeadlines() {
       return li;
     }),
   );
-  empty.hidden = upcoming.length > 0;
+  if (empty) empty.hidden = upcoming.length > 0;
 }
 
 // Pipeline
 
 function renderPipeline() {
-  const apps = DATA.applications;
+  const apps = dataset.applications || [];
   const counts = Object.fromEntries(apps.map((a) => [a.bucket, 0]));
   apps.forEach((a) => (counts[a.bucket] = (counts[a.bucket] ?? 0) + 1));
 
   const stats = document.getElementById("pipeline-stats");
-  stats.replaceChildren(
-    ...BUCKET_ORDER.map(([key, label]) => {
-      const wrap = el("div", "stat");
-      wrap.append(el("dt", null, label), el("dd", null, String(counts[key] ?? 0)));
-      return wrap;
-    }),
-  );
+  if (stats) {
+    stats.replaceChildren(
+      ...BUCKET_ORDER.map(([key, label]) => {
+        const wrap = el("div", "stat");
+        wrap.append(el("dt", null, label), el("dd", null, String(counts[key] ?? 0)));
+        return wrap;
+      }),
+    );
+  }
 
-  document.getElementById("pipeline-total").textContent = `${apps.length} logged`;
+  const totalEl = document.getElementById("pipeline-total");
+  if (totalEl) totalEl.textContent = `${apps.length} logged`;
 
   const recent = document.getElementById("pipeline-recent");
+  if (!recent) return;
+
   recent.replaceChildren(
     ...apps.slice(0, 6).map((a) => {
       const li = el("li");
       const body = el("div");
       body.style.minWidth = "0";
       body.append(el("span", "app-company", a.company));
-      body.append(el("span", "app-role", a.role || "Role not recorded"));
+
+      const subLine = el("div", "app-sub");
+      subLine.append(el("span", "app-role", a.role || "Role not recorded"));
+      if (a.date) {
+        subLine.append(el("span", "app-date", a.date));
+      }
+      body.append(subLine);
+
       const pill = el("span", `pill ${a.bucket}`, a.status || "Logged");
       li.append(el("span"), body, pill);
       return li;
@@ -112,6 +130,7 @@ function renderPipeline() {
 
 async function renderLinks() {
   const grid = document.getElementById("link-grid");
+  if (!grid) return;
   const links = await load(LINKS_KEY, DEFAULT_LINKS);
 
   grid.replaceChildren(
@@ -146,19 +165,32 @@ function safeUrl(raw) {
   }
 }
 
-export function initPanels() {
+export async function initPanels() {
+  // Graceful dynamic import of generated data.js
+  try {
+    const dataMod = await import("./data.js");
+    if (dataMod && dataMod.DATA) {
+      dataset = dataMod.DATA;
+    }
+  } catch {
+    // If data.js has not been built yet, dataset stays empty without crashing app.js
+  }
+
   renderDeadlines();
   renderPipeline();
-  renderLinks();
+  await renderLinks();
 
-  document.getElementById("link-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const label = document.getElementById("link-label").value.trim();
-    const url = safeUrl(document.getElementById("link-url").value);
-    if (!label || !url) return;
-    const links = await load(LINKS_KEY, DEFAULT_LINKS);
-    await save(LINKS_KEY, [...links, { label, url }].slice(0, 12));
-    event.target.reset();
-    renderLinks();
-  });
+  const linkForm = document.getElementById("link-form");
+  if (linkForm) {
+    linkForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const label = document.getElementById("link-label").value.trim();
+      const url = safeUrl(document.getElementById("link-url").value);
+      if (!label || !url) return;
+      const links = await load(LINKS_KEY, DEFAULT_LINKS);
+      await save(LINKS_KEY, [...links, { label, url }].slice(0, 16));
+      event.target.reset();
+      renderLinks();
+    });
+  }
 }

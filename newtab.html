@@ -4,17 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
-  <title>Dashboard</title>
+  <title>Dashboard · Endurance</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <canvas id="cosmos-canvas" class="cosmos-canvas" aria-hidden="true"></canvas>
+
   <main class="shell">
     <header class="masthead">
       <div class="masthead-text">
-        <p class="eyebrow" id="date"></p>
+        <p class="eyebrow">
+          <span id="date"></span>
+          <span class="telemetry-pill" id="telemetry-pill"></span>
+        </p>
         <h1 class="greeting" id="greeting">Welcome</h1>
+        <p class="quote-ticker" id="quote-ticker" title="Click to cycle quote"></p>
       </div>
-      <time class="clock" id="clock" datetime=""></time>
+      <div class="clock-block">
+        <time class="clock" id="clock" datetime=""></time>
+        <span class="clock-utc" id="clock-utc"></span>
+      </div>
     </header>
 
     <div class="grid">
@@ -27,10 +36,12 @@
           <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
             <circle class="ring-track" cx="60" cy="60" r="52"></circle>
             <circle class="ring-value" id="ring-value" cx="60" cy="60" r="52"></circle>
+            <g class="ring-pods" id="ring-pods"></g>
           </svg>
           <div class="timer-face">
             <p class="timer-label" id="timer-label">Focus</p>
             <p class="timer-time" id="timer-time" role="timer" aria-live="off">25:00</p>
+            <p class="timer-dilation" id="timer-dilation">Endurance 12-Ring</p>
           </div>
         </div>
         <div class="actions">
@@ -81,12 +92,18 @@
           <button class="btn" type="submit">Add</button>
         </form>
       </section>
+
+      <section class="card atmosphere" id="atmosphere-card" aria-labelledby="atmosphere-title">
+        <!-- Rendered dynamically by js/spotify.js -->
+      </section>
     </div>
 
     <footer class="foot">
       <span><kbd class="kbd">/</kbd> add task</span>
-      <span><kbd class="kbd">Space</kbd> start or pause timer</span>
-      <span><kbd class="kbd">R</kbd> reset timer</span>
+      <span><kbd class="kbd">Space</kbd> timer</span>
+      <span><kbd class="kbd">R</kbd> reset</span>
+      <span><kbd class="kbd">M</kbd> focus audio</span>
+      <span><kbd class="kbd">B</kbd> cosmos view</span>
     </footer>
   </main>
 
