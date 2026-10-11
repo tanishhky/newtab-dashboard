@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="masthead-text">
+        <p class="eyebrow" id="date"></p>
+        <h1 class="greeting" id="greeting">Welcome</h1>
+      </div>
+      <time class="clock" id="clock" datetime=""></time>
+    </header>
+
+    <div class="grid">
+      <section class="card focus" aria-labelledby="focus-title">
+        <header class="card-head">
+          <h2 id="focus-title">Focus</h2>
+          <span class="meta" id="focus-sessions">0 today</span>
+        </header>
+        <div class="timer">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-value" id="ring-value" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="timer-face">
+            <p class="timer-label" id="timer-label">Focus</p>
+            <p class="timer-time" id="timer-time" role="timer" aria-live="off">25:00</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="timer-toggle" type="button">Start</button>
+          <button class="btn" id="timer-skip" type="button" aria-label="Skip to next phase">Skip</button>
+          <button class="btn btn-ghost" id="timer-reset" type="button" aria-label="Reset timer">Reset</button>
+        </div>
+      </section>
+
+      <section class="card tasks" aria-labelledby="tasks-title">
+        <header class="card-head">
+          <h2 id="tasks-title">Tasks</h2>
+          <span class="meta" id="tasks-count"></span>
+        </header>
+        <form class="add-task" id="task-form" autocomplete="off">
+          <input class="input" id="task-input" type="text" placeholder="Add a task" maxlength="200" aria-label="New task">
+          <kbd class="kbd" aria-hidden="true">/</kbd>
+        </form>
+        <ul class="list" id="task-list"></ul>
+        <p class="empty" id="task-empty" hidden>Nothing open. Enjoy it.</p>
+      </section>
+
+      <section class="card deadlines" aria-labelledby="deadlines-title">
+        <header class="card-head">
+          <h2 id="deadlines-title">Deadlines</h2>
+        </header>
+        <ul class="list" id="deadline-list"></ul>
+        <p class="empty" id="deadline-empty" hidden>No upcoming deadlines.</p>
+      </section>
+
+      <section class="card pipeline" aria-labelledby="pipeline-title">
+        <header class="card-head">
+          <h2 id="pipeline-title">Pipeline</h2>
+          <span class="meta" id="pipeline-total"></span>
+        </header>
+        <dl class="stats" id="pipeline-stats"></dl>
+        <ul class="list compact" id="pipeline-recent"></ul>
+      </section>
+
+      <section class="card links" aria-labelledby="links-title">
+        <header class="card-head">
+          <h2 id="links-title">Links</h2>
+        </header>
+        <ul class="link-grid" id="link-grid"></ul>
+        <form class="add-link" id="link-form" autocomplete="off">
+          <input class="input" id="link-label" type="text" placeholder="Label" maxlength="24" aria-label="Link label">
+          <input class="input" id="link-url" type="url" placeholder="https://" aria-label="Link URL">
+          <button class="btn" type="submit">Add</button>
+        </form>
+      </section>
+    </div>
+
+    <footer class="foot">
+      <span><kbd class="kbd">/</kbd> add task</span>
+      <span><kbd class="kbd">Space</kbd> start or pause timer</span>
+      <span><kbd class="kbd">R</kbd> reset timer</span>
+    </footer>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

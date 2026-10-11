@@ -1,0 +1,6 @@
+# Personal data generated from the private application log and deadlines.
+js/data.js
+data/deadlines.json
+
+__pycache__/
+.DS_Store
