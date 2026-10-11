@@ -1,11 +1,14 @@
 """Generate js/data.js from the private application log and deadline list.
 
-Reads Applications/applications.csv (free-text status column) and
-data/deadlines.json, normalizes both, and writes an ES module the new tab
-page imports. The output holds personal data, so it is gitignored.
+Reads Applications/applications.csv (free-text status column),
+data/deadlines.json and the job dashboard's summary
+(Applications/dashboard-summary.json, written by build_dashboard.py), and
+writes an ES module the new tab page imports. The output holds personal data,
+so it is gitignored. build_dashboard.py calls this after every rebuild, so the
+new tab refreshes on the same daily schedule as the dashboard.
 
 Usage:
-    python3 tools/build_data.py [--csv PATH] [--deadlines PATH] [--out PATH]
+    python3 tools/build_data.py [--csv PATH] [--deadlines PATH] [--summary PATH] [--out PATH]
 """
 
 import argparse
@@ -18,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CSV = Path.home() / "Documents/SecondBrain/Applications/applications.csv"
 DEFAULT_DEADLINES = ROOT / "data/deadlines.json"
+DEFAULT_SUMMARY = Path.home() / "Documents/SecondBrain/Applications/dashboard-summary.json"
 DEFAULT_OUT = ROOT / "js/data.js"
 
 
@@ -28,13 +32,13 @@ def bucket(status: str) -> str:
         return "rejected"
     if s.startswith("selected") or s.startswith("offer"):
         return "selected"
-    if s.startswith("assessment"):
+    if s.startswith(("assessment", "interview")):
         return "assessment"
     if s.startswith("applied"):
         return "applied"
     if s.startswith("resume ready"):
         return "ready"
-    if s.startswith(("skipped", "closed")):
+    if s.startswith(("skipped", "closed", "withdrawn")):
         return "closed"
     return "other"
 
@@ -84,9 +88,19 @@ def load_deadlines(path: Path) -> list[dict]:
     return sorted(items, key=lambda d: (d["date"], d.get("time", "")))
 
 
-def render(applications: list[dict], deadlines: list[dict]) -> str:
+def load_summary(path: Path) -> dict | None:
+    """Today's job-hunt counts and next actions; None when the dashboard has not been built."""
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
+
+
+def render(applications: list[dict], deadlines: list[dict], jobs: dict | None = None) -> str:
     payload = json.dumps(
-        {"applications": applications, "deadlines": deadlines},
+        {"applications": applications, "deadlines": deadlines, "jobs": jobs},
         indent=2,
         ensure_ascii=False,
     )
@@ -100,14 +114,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV)
     parser.add_argument("--deadlines", type=Path, default=DEFAULT_DEADLINES)
+    parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
 
     apps = load_applications(args.csv)
     deadlines = load_deadlines(args.deadlines)
+    jobs = load_summary(args.summary)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(render(apps, deadlines), encoding="utf-8")
-    print(f"wrote {args.out}: {len(apps)} applications, {len(deadlines)} deadlines")
+    args.out.write_text(render(apps, deadlines, jobs), encoding="utf-8")
+    print(f"wrote {args.out}: {len(apps)} applications, {len(deadlines)} deadlines, "
+          f"job summary {'included' if jobs else 'missing'}")
 
 
 if __name__ == "__main__":

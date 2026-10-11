@@ -22,6 +22,14 @@
         </p>
         <h1 class="greeting" id="greeting">Welcome</h1>
         <p class="quote-ticker" id="quote-ticker" title="Click to cycle quote"></p>
+        <button class="jobs-launch" id="jobs-launch" type="button" title="Open the job dashboard (J). Cmd-click for a new tab.">
+          <span class="jobs-orb" aria-hidden="true"></span>
+          <span class="jobs-launch-text">
+            <span class="jobs-launch-title">Job Hunt</span>
+            <span class="jobs-launch-sub" id="jobs-launch-sub">loading</span>
+          </span>
+          <kbd class="kbd jobs-kbd" aria-hidden="true">J</kbd>
+        </button>
       </div>
       <div class="clock-block">
         <time class="clock" id="clock" datetime=""></time>
@@ -84,13 +92,19 @@
         <ul class="email-list" id="email-list"></ul>
       </section>
 
-      <section class="card pipeline" aria-labelledby="pipeline-title">
+      <section class="card jobs" aria-labelledby="jobs-title">
         <header class="card-head">
-          <h2 id="pipeline-title">Pipeline</h2>
-          <span class="meta" id="pipeline-total"></span>
+          <h2 id="jobs-title">Job Hunt</h2>
+          <span class="meta" id="jobs-updated"></span>
         </header>
-        <dl class="stats" id="pipeline-stats"></dl>
-        <ul class="list compact" id="pipeline-recent"></ul>
+        <dl class="stats" id="jobs-stats"></dl>
+        <p class="jobs-label">Next up</p>
+        <ul class="list compact jobs-next" id="jobs-next"></ul>
+        <p class="jobs-note" id="jobs-note" hidden></p>
+        <div class="jobs-foot">
+          <button class="btn btn-primary" id="jobs-open" type="button">Open dashboard</button>
+          <span class="jobs-foot-hint">or press <kbd class="kbd">J</kbd></span>
+        </div>
       </section>
 
       <section class="card deadlines" aria-labelledby="deadlines-title">
@@ -133,6 +147,7 @@
       <span><kbd class="kbd">R</kbd> reset</span>
       <span><kbd class="kbd">M</kbd> focus audio</span>
       <span><kbd class="kbd">B</kbd> cosmos view</span>
+      <span><kbd class="kbd">J</kbd> job hunt</span>
     </footer>
   </main>
 

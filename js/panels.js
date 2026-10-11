@@ -1,4 +1,4 @@
-// Read-only panels: deadlines, application pipeline, and quick links.
+// Read-only panels: deadlines and quick links. The job pipeline lives in jobs.js.
 // Resilient to missing data.js: falls back to empty state with a build tip.
 
 import { load, save } from "./store.js";
@@ -14,12 +14,6 @@ const DEFAULT_LINKS = [
   { label: "SSRN", url: "https://hq.ssrn.com" },
 ];
 
-const BUCKET_ORDER = [
-  ["applied", "Applied"],
-  ["assessment", "Assessment"],
-  ["ready", "Resume Ready"],
-  ["rejected", "Rejected"],
-];
 
 const LINKS_KEY = "links";
 const ACCOUNTS_KEY = "accounts";
@@ -82,51 +76,6 @@ function renderDeadlines() {
     }),
   );
   if (empty) empty.hidden = upcoming.length > 0;
-}
-
-// Pipeline
-
-function renderPipeline() {
-  const apps = dataset.applications || [];
-  const counts = Object.fromEntries(apps.map((a) => [a.bucket, 0]));
-  apps.forEach((a) => (counts[a.bucket] = (counts[a.bucket] ?? 0) + 1));
-
-  const stats = document.getElementById("pipeline-stats");
-  if (stats) {
-    stats.replaceChildren(
-      ...BUCKET_ORDER.map(([key, label]) => {
-        const wrap = el("div", "stat");
-        wrap.append(el("dt", null, label), el("dd", null, String(counts[key] ?? 0)));
-        return wrap;
-      }),
-    );
-  }
-
-  const totalEl = document.getElementById("pipeline-total");
-  if (totalEl) totalEl.textContent = `${apps.length} logged`;
-
-  const recent = document.getElementById("pipeline-recent");
-  if (!recent) return;
-
-  recent.replaceChildren(
-    ...apps.slice(0, 6).map((a) => {
-      const li = el("li");
-      const body = el("div");
-      body.style.minWidth = "0";
-      body.append(el("span", "app-company", a.company));
-
-      const subLine = el("div", "app-sub");
-      subLine.append(el("span", "app-role", a.role || "Role not recorded"));
-      if (a.date) {
-        subLine.append(el("span", "app-date", a.date));
-      }
-      body.append(subLine);
-
-      const pill = el("span", `pill ${a.bucket}`, a.status || "Logged");
-      li.append(el("span"), body, pill);
-      return li;
-    }),
-  );
 }
 
 // Links
@@ -287,7 +236,6 @@ export async function initPanels() {
   }
 
   renderDeadlines();
-  renderPipeline();
   await renderLinks();
   await renderAccounts();
   bindAccountControls();

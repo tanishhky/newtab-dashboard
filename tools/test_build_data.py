@@ -18,6 +18,8 @@ class BucketTests(unittest.TestCase):
             "Resume Ready (applications open 2026-12-01)": "ready",
             "Skipped": "closed",
             "Closed": "closed",
+            "Interview 2026-10-14 (first round)": "assessment",
+            "Withdrawn 2026-10-12": "closed",
             "Referral Intro": "other",
             "—": "other",
             "": "other",
@@ -66,6 +68,24 @@ class LoadTests(unittest.TestCase):
             path.write_text('[{"title": "x", "date": "2026-13-40"}]', encoding="utf-8")
             with self.assertRaises(ValueError):
                 bd.load_deadlines(path)
+
+
+class SummaryTests(unittest.TestCase):
+    def test_summary_is_embedded_when_present(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "summary.json"
+            path.write_text('{"toSubmit": 3, "newLeads": 12}', encoding="utf-8")
+            jobs = bd.load_summary(path)
+        self.assertEqual(jobs["toSubmit"], 3)
+        self.assertIn('"toSubmit": 3', bd.render([], [], jobs))
+
+    def test_missing_or_broken_summary_is_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIsNone(bd.load_summary(Path(tmp) / "absent.json"))
+            bad = Path(tmp) / "bad.json"
+            bad.write_text("{not json", encoding="utf-8")
+            self.assertIsNone(bd.load_summary(bad))
+        self.assertIn('"jobs": null', bd.render([], []))
 
 
 if __name__ == "__main__":

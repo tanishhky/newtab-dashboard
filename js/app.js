@@ -7,6 +7,7 @@ import { initBackdrop, cycleBackdropMode } from "./backdrop.js";
 import { initAmbient, cycleAmbientMode } from "./ambient.js";
 import { initAtmosphere } from "./spotify.js";
 import { initEmails } from "./emails.js";
+import { initJobs, openJobs } from "./jobs.js";
 
 const els = {
   date: document.getElementById("date"),
@@ -119,6 +120,9 @@ function bindShortcuts() {
     } else if (event.key.toLowerCase() === "b") {
       event.preventDefault();
       await cycleBackdropMode();
+    } else if (event.key.toLowerCase() === "j") {
+      event.preventDefault();
+      await openJobs("today", event.shiftKey);
     }
   });
 }
@@ -139,5 +143,6 @@ await initAmbient();
 await initTasks();
 await initTimer();
 await initPanels();
+await initJobs();
 await initEmails();
 await initAtmosphere();
