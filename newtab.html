@@ -74,6 +74,14 @@
         <header class="card-head">
           <h2 id="links-title">Links</h2>
         </header>
+        <div class="account-bar">
+          <select class="input" id="account-select" aria-label="Google account for Gmail and Calendar"></select>
+          <button class="btn btn-quiet" id="account-remove" type="button">Remove</button>
+        </div>
+        <form class="add-account" id="account-form" autocomplete="off">
+          <input class="input" id="account-email" type="email" placeholder="Add a Google account email" maxlength="254" aria-label="Google account email">
+          <button class="btn" type="submit">Use account</button>
+        </form>
         <ul class="link-grid" id="link-grid"></ul>
         <form class="add-link" id="link-form" autocomplete="off">
           <input class="input" id="link-label" type="text" placeholder="Label" maxlength="24" aria-label="Link label">

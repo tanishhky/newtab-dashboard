@@ -14,6 +14,11 @@
   --warn: #e9c46f;
   --bad: #ec8e8e;
   --track: rgba(255, 255, 255, 0.08);
+  --ok-bg: rgba(127, 211, 168, 0.12);
+  --warn-bg: rgba(233, 196, 111, 0.12);
+  --accent-bg: rgba(143, 179, 255, 0.12);
+  --bad-bg: rgba(236, 142, 142, 0.12);
+  --neutral-bg: rgba(255, 255, 255, 0.06);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 
   --radius-lg: 18px;
@@ -42,6 +47,11 @@
     --warn: #a86b00;
     --bad: #c2453f;
     --track: rgba(15, 20, 35, 0.08);
+    --ok-bg: #e5f3ea;
+    --warn-bg: #fbf0d9;
+    --accent-bg: #e3edf9;
+    --bad-bg: #f8e3e1;
+    --neutral-bg: #eeece7;
   }
 }
 
@@ -440,11 +450,13 @@ button, input { font: inherit; color: inherit; }
   background: currentColor;
 }
 
-.pill.selected { color: var(--ok); }
-.pill.assessment { color: var(--warn); }
-.pill.applied { color: var(--accent); }
-.pill.rejected { color: var(--bad); }
-.pill.ready { color: var(--text-2); }
+.pill.selected { color: var(--ok); background: var(--ok-bg); border-color: transparent; }
+.pill.assessment { color: var(--warn); background: var(--warn-bg); border-color: transparent; }
+.pill.applied { color: var(--accent); background: var(--accent-bg); border-color: transparent; }
+.pill.rejected { color: var(--bad); background: var(--bad-bg); border-color: transparent; }
+.pill.ready,
+.pill.closed,
+.pill.other { color: var(--text-2); background: var(--neutral-bg); border-color: transparent; }
 
 .app-company { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .app-role {
@@ -517,6 +529,23 @@ button, input { font: inherit; color: inherit; }
   grid-template-columns: 1fr 2fr auto;
   gap: 8px;
 }
+
+.account-bar,
+.add-account {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-3);
+}
+
+.btn-quiet:disabled { opacity: 0.4; cursor: default; }
+.btn:disabled { cursor: default; }
 
 /* Footer */
 .foot {

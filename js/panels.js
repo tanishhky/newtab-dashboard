@@ -5,8 +5,8 @@ import { DATA } from "./data.js";
 import { load, save } from "./store.js";
 
 const DEFAULT_LINKS = [
-  { label: "Gmail", url: "https://mail.google.com" },
-  { label: "Calendar", url: "https://calendar.google.com" },
+  { label: "Gmail", url: "https://mail.google.com/mail/", google: true },
+  { label: "Calendar", url: "https://calendar.google.com/calendar/", google: true },
   { label: "Todoist", url: "https://app.todoist.com" },
   { label: "GitHub", url: "https://github.com/tanishhky" },
 ];
@@ -19,6 +19,9 @@ const BUCKET_ORDER = [
 ];
 
 const LINKS_KEY = "links";
+const ACCOUNTS_KEY = "accounts";
+const ACTIVE_ACCOUNT_KEY = "activeAccount";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MS_PER_DAY = 86_400_000;
 
@@ -110,15 +113,25 @@ function renderPipeline() {
 
 // Links
 
+// Google services take ?authuser=<email> to open the chosen account directly.
+// Without it, Google falls back to whichever account is first signed in.
+function resolveUrl(link, account) {
+  if (!link.google || !account) return link.url;
+  const url = new URL(link.url);
+  url.searchParams.set("authuser", account);
+  return url.href;
+}
+
 async function renderLinks() {
   const grid = document.getElementById("link-grid");
   const links = await load(LINKS_KEY, DEFAULT_LINKS);
+  const account = await load(ACTIVE_ACCOUNT_KEY, null);
 
   grid.replaceChildren(
     ...links.map((link, index) => {
       const li = el("li");
       const anchor = el("a", "link-tile");
-      anchor.href = link.url;
+      anchor.href = resolveUrl(link, account);
       anchor.rel = "noopener noreferrer";
       anchor.append(el("span", null, link.label));
       const remove = el("button", "link-remove", "×");
@@ -146,10 +159,61 @@ function safeUrl(raw) {
   }
 }
 
+// Account picker
+
+async function renderAccounts() {
+  const select = document.getElementById("account-select");
+  const remove = document.getElementById("account-remove");
+  const accounts = await load(ACCOUNTS_KEY, []);
+  const active = await load(ACTIVE_ACCOUNT_KEY, null);
+
+  const placeholder = new Option("Default (first signed-in account)", "");
+  select.replaceChildren(
+    placeholder,
+    ...accounts.map((email) => new Option(email, email, false, email === active)),
+  );
+  select.value = active && accounts.includes(active) ? active : "";
+  remove.disabled = !select.value;
+}
+
 export function initPanels() {
   renderDeadlines();
   renderPipeline();
   renderLinks();
+  renderAccounts();
+
+  document.getElementById("account-select").addEventListener("change", async (event) => {
+    await save(ACTIVE_ACCOUNT_KEY, event.target.value || null);
+    renderAccounts();
+    renderLinks();
+  });
+
+  document.getElementById("account-remove").addEventListener("click", async () => {
+    const select = document.getElementById("account-select");
+    const accounts = (await load(ACCOUNTS_KEY, [])).filter((email) => email !== select.value);
+    await save(ACCOUNTS_KEY, accounts);
+    await save(ACTIVE_ACCOUNT_KEY, null);
+    renderAccounts();
+    renderLinks();
+  });
+
+  document.getElementById("account-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const input = document.getElementById("account-email");
+    const email = input.value.trim().toLowerCase();
+    if (!EMAIL_PATTERN.test(email)) {
+      input.setCustomValidity("Enter a valid email address");
+      input.reportValidity();
+      return;
+    }
+    input.setCustomValidity("");
+    const accounts = await load(ACCOUNTS_KEY, []);
+    if (!accounts.includes(email)) await save(ACCOUNTS_KEY, [...accounts, email]);
+    await save(ACTIVE_ACCOUNT_KEY, email);
+    event.target.reset();
+    renderAccounts();
+    renderLinks();
+  });
 
   document.getElementById("link-form").addEventListener("submit", async (event) => {
     event.preventDefault();
