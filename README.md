@@ -43,6 +43,7 @@ Opened as a plain page, the storage layer falls back to `localStorage`, so tasks
 | `js/app.js` | Dual UTC clock, Sol day telemetry, quote ticker, shortcuts |
 | `js/sky.js` | Static sky painted once at screen resolution: seeded starfield and a stylised Gargantua. Also inlined into the job dashboard |
 | `js/backdrop.js` | Sky mode switcher (Gargantua, Deep Field, Void) |
+| `icons/` | `gargantua.svg` (tab icon, PNGs for the extension icon) and `jobhunt.svg` (Job Hunt launcher, also the job dashboard's tab icon and sidebar mark) |
 | `js/ambient.js` | Web Audio API Miller's Planet tick and Cosmic Drone synthesizer |
 | `js/spotify.js` | Spotify atmospheric presets and focus sound controls |
 | `js/timer.js` | Endurance 12-module ring timer with Miller time dilation metrics |
