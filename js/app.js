@@ -8,6 +8,7 @@ import { initAmbient, cycleAmbientMode } from "./ambient.js";
 import { initAtmosphere } from "./spotify.js";
 import { initEmails } from "./emails.js";
 import { initJobs, openJobs } from "./jobs.js";
+import { initPrep } from "./prep.js";
 
 const els = {
   date: document.getElementById("date"),
@@ -144,5 +145,6 @@ await initTasks();
 await initTimer();
 await initPanels();
 await initJobs();
+await initPrep();
 await initEmails();
 await initAtmosphere();

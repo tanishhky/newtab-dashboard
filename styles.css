@@ -184,6 +184,76 @@ button, input { font: inherit; color: inherit; }
 .links { grid-column: span 4; }
 .atmosphere { grid-column: span 4; }
 
+/* Assessment Prep: full-width row between the job row and the dock row */
+.prep { grid-column: span 12; display: flex; flex-direction: column; }
+.prep-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 32px;
+}
+.prep-list { list-style: none; margin: 0 0 12px; padding: 0; }
+.prep-item { border-top: 1px solid var(--border); }
+.prep-item:first-child { border-top: 0; }
+.prep-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.prep-check { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; cursor: pointer; }
+.prep-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 2px 6px;
+  margin: 0 -6px;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.prep-open:hover, .prep-open:focus-visible { background: rgba(255, 255, 255, 0.04); outline: none; }
+.prep-open:focus-visible { box-shadow: var(--focus-ring); }
+.prep-title { font-weight: 500; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prep-sub { color: var(--text-3); font-size: 12px; }
+.prep-time { color: var(--text-2); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prep-item.is-done .prep-title { color: var(--text-3); text-decoration: line-through; }
+.prep-item.is-done .prep-time { opacity: 0.6; }
+
+.prep-info-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--text-2);
+  font: italic 600 12px/1 var(--font-display);
+  cursor: pointer;
+  transition: color 160ms var(--ease), border-color 160ms var(--ease);
+}
+.prep-info-btn:hover, .prep-info-btn[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+.prep-info-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.prep-info {
+  margin: 0 0 8px;
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.prep-plan { margin-bottom: 16px; }
+.prep-info-body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 13px; }
+.prep-info-body dt { color: var(--text-3); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; padding-top: 1px; }
+.prep-info-body dd { margin: 0; color: var(--text); line-height: 1.45; }
+
 .card-head {
   display: flex;
   align-items: baseline;
@@ -984,6 +1054,7 @@ button, input { font: inherit; color: inherit; }
 /* Responsive */
 @media (max-width: 900px) {
   .focus, .deadlines, .tasks, .jobs, .links, .atmosphere { grid-column: span 12; }
+  .prep-groups { grid-template-columns: minmax(0, 1fr); }
   .card { grid-column: span 12; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

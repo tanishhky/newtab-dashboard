@@ -49,6 +49,7 @@ Opened as a plain page, the storage layer falls back to `localStorage`, so tasks
 | `js/timer.js` | Endurance 12-module ring timer with Miller time dilation metrics |
 | `js/tasks.js` | Task list, persisted in `chrome.storage.local` |
 | `js/jobs.js` | Job Hunt launcher and card: today's counts, next actions, deep links into the dashboard |
+| `js/prep.js` | Assessment Prep card: quant-test study list with a time budget and purpose behind each item's info button, tick marks kept in `chrome.storage.local` |
 | `js/panels.js` | Deadlines and quick links |
 | `js/store.js` | Storage with a `localStorage` fallback |
 | `tools/build_data.py` | Turns the CSV and deadline list into `js/data.js` |
