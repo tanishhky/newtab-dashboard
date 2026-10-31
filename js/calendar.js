@@ -1,11 +1,12 @@
 // Calendar agenda for the next seven days, read from data/calendar.json.
-// That file is a snapshot (see data/calendar.example.json for the shape). The page
-// says how old the snapshot is, so a stale agenda never passes for a live one.
+// That file is written by tools/fetch_calendar.py (see data/calendar.example.json for the shape).
+// The page says when it was last synced, so a stale agenda never passes for a live one.
 
 const CALENDAR_URL = "https://calendar.google.com/calendar/r?authuser=ty2766@nyu.edu";
 const DAYS = 7;
 const MAX_ROWS = 9;
-const STALE_DAYS = 2;
+const STALE_HOURS = 3;
+const REFRESH_MS = 60_000;
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -112,23 +113,16 @@ function renderStamp(snapshot) {
   const stamp = document.getElementById("cal-stamp");
   if (!snapshot.generated) return;
   const made = new Date(snapshot.generated.replace(" ", "T"));
-  const age = (Date.now() - made.getTime()) / 86_400_000;
+  const hours = (Date.now() - made.getTime()) / 3_600_000;
   const when = made.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-  stamp.textContent =
-    age > STALE_DAYS
-      ? `Snapshot from ${when}, ${Math.floor(age)} days old. Ask Claude to refresh it.`
-      : `Snapshot from ${when}`;
-  stamp.classList.toggle("warn", age > STALE_DAYS);
+  const late = hours > STALE_HOURS;
+  stamp.textContent = late
+    ? `Last synced ${when}. The calendar job has stopped, or this is a one-off snapshot.`
+    : `Synced ${when}${snapshot.live ? "" : " (snapshot)"}`;
+  stamp.classList.toggle("warn", late);
 }
 
-export async function initCalendar() {
-  const link = document.getElementById("cal-open");
-  if (link) {
-    link.href = CALENDAR_URL;
-    link.target = "_blank";
-    link.rel = "noopener";
-  }
-
+async function loadAndRender() {
   const box = document.getElementById("agenda");
   try {
     const response = await fetch("data/calendar.json", { cache: "no-store" });
@@ -138,7 +132,23 @@ export async function initCalendar() {
     renderStamp(snapshot);
   } catch {
     box.replaceChildren(
-      el("p", "empty", "No calendar snapshot yet. Copy data/calendar.example.json to data/calendar.json, or ask Claude to fill it."),
+      el("p", "empty", "No calendar data yet. Run tools/fetch_calendar.py --auth once, or copy data/calendar.example.json to data/calendar.json."),
     );
   }
+}
+
+export async function initCalendar() {
+  const link = document.getElementById("cal-open");
+  if (link) {
+    link.href = CALENDAR_URL;
+    link.target = "_blank";
+    link.rel = "noopener";
+  }
+  await loadAndRender();
+  // Live: the fetch job rewrites data/calendar.json every 10 minutes; re-read it every minute
+  // and whenever the tab comes back into view, so "Now" and the day boundaries stay right too.
+  setInterval(loadAndRender, REFRESH_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) loadAndRender();
+  });
 }

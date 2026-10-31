@@ -5,3 +5,4 @@ data/calendar.json
 
 __pycache__/
 .DS_Store
+tools/.calendar_token.json

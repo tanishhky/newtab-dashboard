@@ -15,16 +15,28 @@ A private, minimal new tab page for Chrome: Job Hunt, a seven-day calendar agend
 |---|---|---|
 | `js/data.js` | application log, deadlines, job summary | `python3 tools/build_data.py`; `Applications/build_dashboard.py` runs it on every rebuild |
 | `data/deadlines.json` | deadlines | by hand; start from `data/deadlines.example.json` |
-| `data/calendar.json` | a snapshot of the next few weeks of calendar events | filled by Claude from Google Calendar, or by hand; shape in `data/calendar.example.json` |
+| `data/calendar.json` | the next two weeks of events from every calendar the account can see | `tools/fetch_calendar.py`; shape in `data/calendar.example.json` |
 
-The calendar card prints how old the snapshot is and warns after two days. It is not live. For a live agenda the options are an iCal secret address (if the Workspace allows it) or a small OAuth script.
+### Live calendar
+
+`tools/fetch_calendar.py` reads every calendar on your Google account (NYU calendars shared to it included), lets Google expand recurring events, and rewrites `data/calendar.json`. The page re-reads that file every minute, so the agenda follows the account with at most a ten-minute lag. It uses the same Google OAuth client as `scripts/linkedin_leads.py` with the read-only calendar scope (the Calendar API must be enabled in that Google Cloud project).
+
+```sh
+PY=~/Documents/SecondBrain/scripts/.venv/bin/python
+$PY tools/fetch_calendar.py --auth     # once; sign in with the tanishhky account
+$PY tools/fetch_calendar.py            # writes data/calendar.json
+cp tools/com.tanishk.newtab-calendar.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.tanishk.newtab-calendar.plist
+```
+
+The job runs every ten minutes. Like the other agents, it needs Full Disk Access on the python binary to read `~/Documents`; logs go to `~/Library/Logs/com.tanishk.newtab-calendar.*`. The calendar card says when it last synced and warns after three hours.
 
 ## Design
 
 - Dark indigo field with three slow-drifting colour clouds and fine grain (CSS only, no images).
 - Panels are tinted glass: dark base, strong colour wash, blurred backdrop, hairline edge. Each card family owns one hue (`--t` in `styles.css`).
 - One accent colour (gold) for the primary action and the "now" marker.
-- Left column: Job Hunt, Practice, Quick links. Right column: Calendar, Deadlines.
+- Left column: Job Hunt, Library (practice, thesis and capstone, job-search artifacts and books). Right column: Calendar, Deadlines, Quick links. Full width below: Assessment prep (study list with time budgets, tick marks kept in `localStorage`).
 
 ## Layout
 
@@ -33,9 +45,11 @@ The calendar card prints how old the snapshot is and warns after two days. It is
 | `newtab.html`, `styles.css` | page and design system |
 | `js/app.js` | greeting, clock, `J` shortcut, wiring |
 | `js/jobs.js` | Job Hunt: counts, in motion, ready to submit, deep links into the job dashboard |
-| `js/calendar.js` | agenda from `data/calendar.json` |
+| `js/calendar.js` | agenda from `data/calendar.json`, refreshed every minute |
 | `js/deadlines.js` | upcoming deadlines |
-| `js/links.js` | Practice tiles and Quick links (edit the two lists at the top) |
+| `js/prep.js` | Assessment prep card |
+| `js/links.js` | Library tiles and Quick links (edit the two lists at the top) |
+| `tools/fetch_calendar.py` | live calendar fetch, with `test_fetch_calendar.py` and a launchd plist |
 | `js/open.js` | opening web and `file://` links, with the file-access hint |
 | `js/sky.js`, `icons/jobhunt.svg` | not used by this page; `Applications/build_dashboard.py` inlines them into the job dashboard |
 | `tools/build_data.py` | builds `js/data.js` |

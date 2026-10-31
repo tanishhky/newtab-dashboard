@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.tanishk.newtab-calendar</string>
+  <!-- Same pattern as the other com.tanishk agents: python is called directly so only that
+       one binary needs Full Disk Access to read ~/Documents, venv packages via PYTHONPATH.
+       Install after the one-time sign-in (tools/fetch_calendar.py --auth):
+         cp tools/com.tanishk.newtab-calendar.plist ~/Library/LaunchAgents/
+         launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.tanishk.newtab-calendar.plist -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/Caskroom/miniconda/base/bin/python3.14</string>
+    <string>/Users/tanishkyadav/Documents/SecondBrain/GitHub/newtab-dashboard/tools/fetch_calendar.py</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PYTHONPATH</key><string>/Users/tanishkyadav/Documents/SecondBrain/scripts/.venv/lib/python3.14/site-packages</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>600</integer>
+  <key>StandardOutPath</key><string>/Users/tanishkyadav/Library/Logs/com.tanishk.newtab-calendar.out</string>
+  <key>StandardErrorPath</key><string>/Users/tanishkyadav/Library/Logs/com.tanishk.newtab-calendar.err</string>
+</dict>
+</plist>

@@ -46,18 +46,13 @@
         <p class="stamp" id="jobs-updated"></p>
       </section>
 
-      <section class="card practice" aria-labelledby="practice-title">
+      <section class="card library" aria-labelledby="lib-title">
         <header class="card-head">
-          <h2 id="practice-title">Practice</h2>
+          <h2 id="lib-title">Library</h2>
+          <span class="meta">artifacts and books</span>
         </header>
-        <ul class="tiles" id="practice-list"></ul>
-      </section>
-
-      <section class="card links" aria-labelledby="links-title">
-        <header class="card-head">
-          <h2 id="links-title">Quick links</h2>
-        </header>
-        <ul class="chips" id="link-list"></ul>
+        <div id="library"></div>
+        <p class="note" id="library-note" hidden></p>
       </section>
       </div>
       <div class="col">
@@ -76,8 +71,32 @@
         </header>
         <ul class="rows" id="deadline-list"></ul>
       </section>
+
+      <section class="card links" aria-labelledby="links-title">
+        <header class="card-head">
+          <h2 id="links-title">Quick links</h2>
+        </header>
+        <ul class="chips" id="link-list"></ul>
+      </section>
       </div>
     </div>
+
+    <section class="card prep" aria-labelledby="prep-title">
+      <header class="card-head">
+        <div class="head-left">
+          <h2 id="prep-title">Assessment prep</h2>
+          <button class="info-btn" id="prep-info-btn" type="button" aria-label="About this card: purpose and time to dedicate" aria-expanded="false" aria-controls="prep-plan">i</button>
+        </div>
+        <div class="head-right">
+          <span class="meta" id="prep-meta"></span>
+          <button class="open-btn" id="prep-next" type="button" title="Opens the highest-priority item not yet ticked">Start next block</button>
+        </div>
+      </header>
+      <div class="info-panel" id="prep-plan" hidden></div>
+      <div class="prep-groups" id="prep-groups"></div>
+      <p class="note" id="prep-note" hidden></p>
+    </section>
+
   </main>
 
   <script type="module" src="js/app.js"></script>

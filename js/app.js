@@ -4,6 +4,7 @@ import { initJobs, openJobs } from "./jobs.js";
 import { initCalendar } from "./calendar.js";
 import { initDeadlines } from "./deadlines.js";
 import { initLinks } from "./links.js";
+import { initPrep } from "./prep.js";
 
 const dateEl = document.getElementById("date");
 const greetingEl = document.getElementById("greeting");
@@ -41,4 +42,5 @@ tick();
 setInterval(tick, 10_000);
 
 initLinks();
+initPrep();
 await Promise.all([initJobs(), initCalendar(), initDeadlines()]);
