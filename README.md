@@ -52,7 +52,6 @@ The job runs every ten minutes. Like the other agents, it needs Full Disk Access
 | `js/links.js` | Library tiles and Quick links (edit the two lists at the top) |
 | `tools/fetch_calendar.py` | live calendar fetch, with `test_fetch_calendar.py` and a launchd plist |
 | `js/open.js` | opening web and `file://` links, with the file-access hint |
-| `js/sky.js`, `icons/jobhunt.svg` | not used by this page; `Applications/build_dashboard.py` inlines them into the job dashboard |
 | `tools/build_data.py` | builds `js/data.js` |
 
 ## Develop
