@@ -1,6 +1,6 @@
 # Home
 
-A private, minimal new tab page for Chrome: Job Hunt, a seven-day calendar agenda, deadlines, practice links and quick links. No framework, no accounts, no tracking, no extension permissions. Everything runs locally.
+A private, minimal new tab page for Chrome: deadlines, Job Hunt, a seven-day calendar agenda, a library of practice and thesis artifacts, assessment prep and quick links. No framework, no accounts, no tracking, no extension permissions. Everything runs locally.
 
 ## Install
 
@@ -33,10 +33,11 @@ The job runs every ten minutes. Like the other agents, it needs Full Disk Access
 
 ## Design
 
-- Dark indigo field with three slow-drifting colour clouds and fine grain (CSS only, no images).
-- Panels are tinted glass: dark base, strong colour wash, blurred backdrop, hairline edge. Each card family owns one hue (`--t` in `styles.css`).
-- One accent colour (gold) for the primary action and the "now" marker.
-- Left column: Job Hunt, Library (practice, thesis and capstone, job-search artifacts and books). Right column: Calendar, Deadlines, Quick links. Full width below: Assessment prep (study list with time budgets, tick marks kept in `localStorage`).
+- **Palette:** deep violet and midnight blue with soft wine and gold light behind glass, ivory text, and one metal (muted gold) for accents, hairline edges and the primary action.
+- **Type:** Didot (Bodoni 72 and Baskerville as fallbacks, all built into macOS) for display only: greeting, clock, card titles and large numerals. Everything you read is SF Pro. Labels are small tracked capitals.
+- **Panels:** tinted glass. Each card family owns one hue (`--t` in `styles.css`); the edge is a gold hairline.
+- **One tile language:** deadlines, calendar events, job rows and library entries are all bounded rounded rectangles, so every item has a visible edge. Calendar events carry a colour bar by source (NYU blue, personal rose, TA gold).
+- **Hierarchy:** Deadlines first and largest (the closer the date, the brighter the tile), then Job Hunt beside Calendar, then Library, Assessment prep and Quick links.
 
 ## Layout
 

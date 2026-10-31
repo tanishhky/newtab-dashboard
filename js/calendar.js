@@ -42,26 +42,38 @@ function clock(date) {
 
 function dayLabel(day, today) {
   const diff = Math.round((day - today) / 86_400_000);
-  const base = day.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
-  if (diff === 0) return ["Today", base];
-  if (diff === 1) return ["Tomorrow", base];
-  return [day.toLocaleDateString(undefined, { weekday: "long" }), day.toLocaleDateString(undefined, { month: "short", day: "numeric" })];
+  const date = day.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  if (diff === 0) return ["Today", date];
+  if (diff === 1) return ["Tomorrow", date];
+  return [day.toLocaleDateString(undefined, { weekday: "long" }), date];
+}
+
+// Colour bar by source: your NYU calendar (blue), personal (rose), TA shifts (gold).
+function accent(event) {
+  if (/^TA\b/i.test(event.title)) return "var(--gold)";
+  if (/gmail\.com/i.test(event.calendar || "")) return "#ff9ec4";
+  return "#8fb4ff";
 }
 
 function eventRow(event, now) {
   const li = el("li", "ev");
+  li.style.setProperty("--evc", accent(event));
   const live = !event.allDay && event.from <= now && now < event.to;
   const past = !event.allDay && event.to <= now;
   if (live) li.classList.add("is-live");
   if (past) li.classList.add("is-past");
 
-  const when = event.allDay ? "All day" : `${clock(event.from)}`;
-  const sub = [event.allDay ? null : `until ${clock(event.to)}`, event.location].filter(Boolean).join(" · ");
+  const time = el("div", "ev-time");
+  if (event.allDay) {
+    time.append(el("span", "ev-start", "All day"));
+  } else {
+    time.append(el("span", "ev-start", live ? "Now" : clock(event.from)), el("span", "ev-end", clock(event.to)));
+  }
   const body = el("div", "row-main");
   body.append(el("span", "row-title", event.title));
-  if (sub) body.append(el("span", "row-sub", sub));
-  li.append(el("span", "ev-time", live ? "Now" : when), body);
-  li.title = [event.title, sub].filter(Boolean).join("\n");
+  if (event.location) body.append(el("span", "row-sub", event.location));
+  li.append(time, body);
+  li.title = [event.title, event.location].filter(Boolean).join("\n");
   return li;
 }
 
@@ -87,8 +99,8 @@ function renderAgenda(events) {
 
     const [name, date] = dayLabel(day, today);
     const section = el("section", "day");
-    const head = el("h3", "day-head", name);
-    head.append(el("span", null, date));
+    const head = el("h3", "day-head");
+    head.append(el("span", "day-name", name), el("span", "day-date", date));
     section.append(head);
 
     const rows = el("ul", "events");

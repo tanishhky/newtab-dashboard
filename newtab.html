@@ -14,6 +14,7 @@
     <span class="blob b1"></span>
     <span class="blob b2"></span>
     <span class="blob b3"></span>
+    <span class="blob b4"></span>
   </div>
 
   <main class="shell">
@@ -24,9 +25,18 @@
       </div>
       <time class="clock" id="clock" datetime=""></time>
     </header>
+    <div class="rule" aria-hidden="true"></div>
+
+    <section class="card deadlines" aria-labelledby="dl-title">
+      <header class="card-head">
+        <h2 id="dl-title">Deadlines</h2>
+        <span class="meta" id="dl-meta"></span>
+      </header>
+      <ul class="dl-tiles" id="deadline-tiles"></ul>
+      <p class="dl-later" id="deadline-later" hidden></p>
+    </section>
 
     <div class="grid">
-      <div class="col">
       <section class="card jobs" aria-labelledby="jobs-title">
         <header class="card-head">
           <h2 id="jobs-title">Job Hunt</h2>
@@ -42,44 +52,31 @@
         <h3 class="section">Ready to submit</h3>
         <ul class="rows" id="jobs-ready"></ul>
 
+        <h3 class="section">Reference</h3>
+        <ul class="tiles" id="jobs-reference"></ul>
+
         <p class="note" id="jobs-note" hidden></p>
         <p class="stamp" id="jobs-updated"></p>
       </section>
 
-      <section class="card library" aria-labelledby="lib-title">
-        <header class="card-head">
-          <h2 id="lib-title">Library</h2>
-          <span class="meta">artifacts and books</span>
-        </header>
-        <div id="library"></div>
-        <p class="note" id="library-note" hidden></p>
-      </section>
-      </div>
-      <div class="col">
       <section class="card calendar" aria-labelledby="cal-title">
         <header class="card-head">
-          <h2 id="cal-title">Next 7 days</h2>
+          <h2 id="cal-title">Calendar</h2>
           <a class="text-link" id="cal-open" href="#">Open calendar</a>
         </header>
         <div class="agenda" id="agenda"></div>
         <p class="stamp" id="cal-stamp"></p>
       </section>
-
-      <section class="card deadlines" aria-labelledby="dl-title">
-        <header class="card-head">
-          <h2 id="dl-title">Deadlines</h2>
-        </header>
-        <ul class="rows" id="deadline-list"></ul>
-      </section>
-
-      <section class="card links" aria-labelledby="links-title">
-        <header class="card-head">
-          <h2 id="links-title">Quick links</h2>
-        </header>
-        <ul class="chips" id="link-list"></ul>
-      </section>
-      </div>
     </div>
+
+    <section class="card library" aria-labelledby="lib-title">
+      <header class="card-head">
+        <h2 id="lib-title">Library</h2>
+        <span class="meta">artifacts and books</span>
+      </header>
+      <div class="lib-grid" id="library"></div>
+      <p class="note" id="library-note" hidden></p>
+    </section>
 
     <section class="card prep" aria-labelledby="prep-title">
       <header class="card-head">
@@ -97,6 +94,10 @@
       <p class="note" id="prep-note" hidden></p>
     </section>
 
+    <section class="card links" aria-labelledby="links-title">
+      <h2 id="links-title">Quick links</h2>
+      <ul class="chips" id="link-list"></ul>
+    </section>
   </main>
 
   <script type="module" src="js/app.js"></script>

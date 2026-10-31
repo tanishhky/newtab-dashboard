@@ -27,6 +27,7 @@ const LIBRARY = [
   },
   {
     heading: "Job search",
+    into: "jobs-reference",
     items: [
       { title: "Quant Job Search Master Profile", sub: "Source of truth for the search", badge: "Artifact", url: `${ART}CRhPkvP1DsjcKceRBe5Fwe` },
     ],
@@ -74,13 +75,20 @@ function tile(item) {
 }
 
 export function initLinks() {
+  const groups = LIBRARY.filter((group) => !group.into);
   document.getElementById("library").replaceChildren(
-    ...LIBRARY.flatMap((group) => {
+    ...groups.map((group) => {
+      const col = el("div", "lib-col");
       const list = el("ul", "tiles");
       list.append(...group.items.map(tile));
-      return [el("h3", "section", group.heading), list];
+      col.append(el("h3", "section", group.heading), list);
+      return col;
     }),
   );
+  // Groups that belong inside another card render there instead.
+  for (const group of LIBRARY.filter((g) => g.into)) {
+    document.getElementById(group.into)?.replaceChildren(...group.items.map(tile));
+  }
 
   document.getElementById("link-list").replaceChildren(
     ...LINKS.map(([label, url]) => {
