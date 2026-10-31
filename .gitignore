@@ -1,6 +1,7 @@
-# Personal data generated from the private application log and deadlines.
+# Personal data generated from the private application log, deadlines and calendar.
 js/data.js
 data/deadlines.json
+data/calendar.json
 
 __pycache__/
 .DS_Store

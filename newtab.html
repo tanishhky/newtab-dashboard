@@ -1,158 +1,82 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Dashboard · Endurance</title>
+  <title>Dashboard</title>
   <link rel="icon" type="image/svg+xml" href="icons/gargantua.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/gargantua-32.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="cosmos-backdrop" id="cosmos-backdrop">
-    <canvas id="sky" class="sky" aria-hidden="true"></canvas>
+  <div class="bg" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
   </div>
 
   <main class="shell">
-    <header class="masthead">
-      <div class="masthead-text">
-        <p class="eyebrow">
-          <span id="date"></span>
-          <span class="telemetry-pill" id="telemetry-pill"></span>
-        </p>
-        <h1 class="greeting" id="greeting">Welcome</h1>
-        <p class="quote-ticker" id="quote-ticker" title="Click to cycle quote"></p>
-        <button class="jobs-launch" id="jobs-launch" type="button" title="Open the job dashboard (J). Cmd-click for a new tab.">
-          <img class="jobs-orb" src="icons/jobhunt.svg" alt="" aria-hidden="true">
-          <span class="jobs-launch-text">
-            <span class="jobs-launch-title">Job Hunt</span>
-            <span class="jobs-launch-sub" id="jobs-launch-sub">loading</span>
-          </span>
-          <kbd class="kbd jobs-kbd" aria-hidden="true">J</kbd>
-        </button>
+    <header class="top">
+      <div>
+        <p class="date" id="date"></p>
+        <h1 id="greeting">Welcome</h1>
       </div>
-      <div class="clock-block">
-        <time class="clock" id="clock" datetime=""></time>
-        <span class="clock-utc" id="clock-utc"></span>
-      </div>
+      <time class="clock" id="clock" datetime=""></time>
     </header>
 
     <div class="grid">
-      <section class="card focus" aria-labelledby="focus-title">
-        <header class="card-head">
-          <h2 id="focus-title">Focus</h2>
-          <span class="meta" id="focus-sessions">0 today</span>
-        </header>
-        <div class="timer">
-          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="ring-track" cx="60" cy="60" r="52"></circle>
-            <circle class="ring-value" id="ring-value" cx="60" cy="60" r="52"></circle>
-            <g class="ring-pods" id="ring-pods"></g>
-          </svg>
-          <div class="timer-face">
-            <p class="timer-label" id="timer-label">Focus</p>
-            <p class="timer-time" id="timer-time" role="timer" aria-live="off">25:00</p>
-          </div>
-        </div>
-        <div class="timer-telemetry-row">
-          <span class="timer-dilation-pill" id="timer-dilation">Endurance 12-Ring</span>
-        </div>
-        <div class="actions">
-          <button class="btn btn-primary" id="timer-toggle" type="button">Start</button>
-          <button class="btn" id="timer-skip" type="button" aria-label="Skip to next phase">Skip</button>
-          <button class="btn btn-ghost" id="timer-reset" type="button" aria-label="Reset timer">Reset</button>
-        </div>
-      </section>
-
-      <section class="card tasks" aria-labelledby="tasks-title">
-        <header class="card-head">
-          <h2 id="tasks-title">Tasks</h2>
-          <span class="meta" id="tasks-count"></span>
-        </header>
-        <form class="add-task" id="task-form" autocomplete="off">
-          <input class="input" id="task-input" type="text" placeholder="Add a task" maxlength="200" aria-label="New task">
-          <kbd class="kbd" aria-hidden="true">/</kbd>
-        </form>
-        <ul class="list" id="task-list"></ul>
-        <p class="empty" id="task-empty" hidden>Nothing open. Enjoy it.</p>
-      </section>
-
-      <section class="card emails" aria-labelledby="emails-title">
-        <header class="card-head">
-          <div class="head-title-row">
-            <h2 id="emails-title">Live Inbox</h2>
-            <button class="icon-btn sync-btn" id="email-refresh-btn" type="button" title="Sync Gmail feed" aria-label="Sync Gmail feed">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-              </svg>
-            </button>
-          </div>
-          <span class="meta" id="email-unread-count">Checking...</span>
-        </header>
-        <ul class="email-list" id="email-list"></ul>
-      </section>
-
       <section class="card jobs" aria-labelledby="jobs-title">
         <header class="card-head">
           <h2 id="jobs-title">Job Hunt</h2>
-          <span class="meta" id="jobs-updated"></span>
+          <button class="open-btn" id="jobs-open" type="button" title="Open the job dashboard. Cmd-click for a new tab.">
+            Open dashboard <kbd>J</kbd>
+          </button>
         </header>
         <dl class="stats" id="jobs-stats"></dl>
-        <p class="jobs-label">Next up</p>
-        <ul class="list compact jobs-next" id="jobs-next"></ul>
-        <p class="jobs-note" id="jobs-note" hidden></p>
-        <div class="jobs-foot">
-          <button class="btn btn-primary" id="jobs-open" type="button">Open dashboard</button>
-          <span class="jobs-foot-hint">or press <kbd class="kbd">J</kbd></span>
-        </div>
+
+        <h3 class="section">In motion</h3>
+        <ul class="rows" id="jobs-motion"></ul>
+
+        <h3 class="section">Ready to submit</h3>
+        <ul class="rows" id="jobs-ready"></ul>
+
+        <p class="note" id="jobs-note" hidden></p>
+        <p class="stamp" id="jobs-updated"></p>
       </section>
 
-      <section class="card deadlines" aria-labelledby="deadlines-title">
+      <section class="card calendar" aria-labelledby="cal-title">
         <header class="card-head">
-          <h2 id="deadlines-title">Deadlines</h2>
+          <h2 id="cal-title">Next 7 days</h2>
+          <a class="text-link" id="cal-open" href="#">Open calendar</a>
         </header>
-        <ul class="list" id="deadline-list"></ul>
-        <p class="empty" id="deadline-empty" hidden>No upcoming deadlines.</p>
+        <div class="agenda" id="agenda"></div>
+        <p class="stamp" id="cal-stamp"></p>
+      </section>
+
+      <section class="card deadlines" aria-labelledby="dl-title">
+        <header class="card-head">
+          <h2 id="dl-title">Deadlines</h2>
+        </header>
+        <ul class="rows" id="deadline-list"></ul>
+      </section>
+
+      <section class="card practice" aria-labelledby="practice-title">
+        <header class="card-head">
+          <h2 id="practice-title">Practice</h2>
+        </header>
+        <ul class="tiles" id="practice-list"></ul>
       </section>
 
       <section class="card links" aria-labelledby="links-title">
         <header class="card-head">
-          <h2 id="links-title">Quick Launch</h2>
-          <span class="meta">App Dock</span>
+          <h2 id="links-title">Quick links</h2>
         </header>
-        <div class="account-bar">
-          <select class="input" id="account-select" aria-label="Google account for Gmail and Calendar"></select>
-          <button class="btn btn-quiet" id="account-remove" type="button">Remove</button>
-        </div>
-        <form class="add-account" id="account-form" autocomplete="off">
-          <input class="input" id="account-email" type="email" placeholder="Add a Google account email" maxlength="254" aria-label="Google account email">
-          <button class="btn" type="submit">Use account</button>
-        </form>
-        <ul class="link-dock" id="link-grid"></ul>
-        <form class="add-link" id="link-form" autocomplete="off">
-          <input class="input" id="link-label" type="text" placeholder="App name" maxlength="24" aria-label="Link label">
-          <input class="input" id="link-url" type="url" placeholder="https://" aria-label="Link URL">
-          <button class="btn" type="submit">Add</button>
-        </form>
-      </section>
-
-      <section class="card atmosphere" id="atmosphere-card" aria-labelledby="atmosphere-title">
-        <!-- Rendered dynamically by js/spotify.js -->
+        <ul class="chips" id="link-list"></ul>
       </section>
     </div>
-
-    <footer class="foot">
-      <span><kbd class="kbd">/</kbd> add task</span>
-      <span><kbd class="kbd">Space</kbd> timer</span>
-      <span><kbd class="kbd">R</kbd> reset</span>
-      <span><kbd class="kbd">M</kbd> focus audio</span>
-      <span><kbd class="kbd">B</kbd> sky</span>
-      <span><kbd class="kbd">J</kbd> job hunt</span>
-    </footer>
   </main>
 
-  <script src="js/sky.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
