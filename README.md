@@ -1,4 +1,4 @@
-# Dashboard
+# Home
 
 A private, minimal new tab page for Chrome: Job Hunt, a seven-day calendar agenda, deadlines, practice links and quick links. No framework, no accounts, no tracking, no extension permissions. Everything runs locally.
 
