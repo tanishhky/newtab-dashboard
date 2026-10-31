@@ -95,7 +95,12 @@ function splitStatus(status) {
 
 function renderMotion(jobs, applications) {
   const list = document.getElementById("jobs-motion");
-  const active = applications.filter((a) => a.bucket === "assessment" || a.bucket === "selected");
+  // Live assessments and interviews only: skip completed ones and anything older than 45 days.
+  const recent = (status) => {
+    const when = /(\d{4}-\d{2}-\d{2})/.exec(status || "");
+    return when ? Date.now() - new Date(`${when[1]}T00:00`).getTime() < 45 * 86_400_000 : true;
+  };
+  const active = applications.filter((a) => a.bucket === "assessment" && !/completed/i.test(a.status) && recent(a.status));
   const shown = active.slice(0, 4).map((app) => {
     const [stage, when] = splitStatus(app.status);
     return row(app.company, app.role, when ? `${stage} · ${when}` : stage, "tag-warm", (event) =>

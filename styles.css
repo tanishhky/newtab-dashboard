@@ -114,19 +114,20 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: 16px;
+  align-items: start;
 }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 
-.jobs      { grid-column: 1 / span 7; grid-row: 1 / span 2; --t: 86 84 214; }
-.calendar  { grid-column: 8 / span 5; --t: 18 128 146; }
-.deadlines { grid-column: 8 / span 5; --t: 70 84 140; }
-.practice  { grid-column: 1 / span 7; --t: 190 72 124; }
-.links     { grid-column: 8 / span 5; --t: 62 70 112; }
+.jobs      { --t: 86 84 214; }
+.calendar  { --t: 18 128 146; }
+.deadlines { --t: 70 84 140; }
+.practice  { --t: 190 72 124; }
+.links     { --t: 62 70 112; }
 
 @media (max-width: 960px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
-  .jobs, .calendar, .deadlines, .practice, .links { grid-column: 1; grid-row: auto; }
   .shell { padding: 28px 16px 48px; }
 }
 
